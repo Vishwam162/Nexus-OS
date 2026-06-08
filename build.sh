@@ -1,5 +1,5 @@
 #!/bin/bash
-# NEXUS OS - Master Compiler Script (Production Fixed)
+# NEXUS OS - Master Compiler Script (Kernel & Boot Package Fix)
 
 echo "🚀 Initiating Nexus OS Compilation Matrix..."
 
@@ -10,11 +10,11 @@ sudo apt-get install -y software-properties-common
 sudo add-apt-repository -y universe
 sudo apt-get update
 
-# 2. Install live-build and utilities
-echo "📦 Installing live-build toolchain and Debian keyrings..."
-sudo apt-get install -y live-build xorriso squashfs-tools debian-archive-keyring
+# 2. Install live-build and image-creation utilities
+echo "📦 Installing live-build toolchain and boot utilities..."
+sudo apt-get install -y live-build xorriso squashfs-tools debian-archive-keyring syslinux isolinux
 
-# 3. Clean up old environments
+# 3. Clean up old environments completely
 echo "🧹 Wiping old build data..."
 sudo lb clean --purge
 
@@ -27,20 +27,30 @@ lb config -d bookworm \
   --archive-areas "main contrib non-free non-free-firmware" \
   --binary-images iso-hybrid
 
-# 5. Define Package Installation Staging List
+# 5. Define Package Installation Staging List (CRITICAL FIX ADDED HERE)
 echo "📦 Staging Nexus packages..."
 mkdir -p config/package-lists
 cat <<EOF > config/package-lists/nexus.list.chroot
+# Core Linux Kernel & Bootloaders (Essential for ISO Generation)
+linux-image-amd64
 live-boot
 live-config
 systemd
+syslinux
+isolinux
+
+# Display Engine Subsystem
 xserver-xorg
 xinit
 wayland-protocols
+
+# Python & AI UI Dependencies
 python3
 python3-pip
 python3-pyqt5
 python3-requests
+
+# Global App Suite (Your Requested Branded & Core Tools)
 chromium
 thunar
 git
