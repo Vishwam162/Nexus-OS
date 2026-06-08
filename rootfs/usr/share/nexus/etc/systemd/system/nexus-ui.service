@@ -1,0 +1,17 @@
+[Unit]
+Description=Nexus OS Revolutionary Orbital Interface
+After=systemd-user-sessions.service graphical.target
+Wants=graphical.target
+
+[Service]
+# Run this as the main user, not root, for security
+User=nexususer
+Environment=DISPLAY=:0
+Environment=WAYLAND_DISPLAY=wayland-0
+# This launches your custom Python graphical interface at boot
+ExecStart=/usr/bin/python3 /usr/share/nexus/nexus_login.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=graphical.target

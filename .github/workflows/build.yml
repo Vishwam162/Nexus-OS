@@ -1,0 +1,32 @@
+name: Nexus OS Cloud Engine ISO Build
+
+on:
+  push:
+    branches: [ "main" ]  # Triggers the build whenever you push to main
+  workflow_dispatch:      # Gives you a button on GitHub to click and build manually
+
+jobs:
+  compile-nexus-iso:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Nexus Source Code
+      uses: actions/checkout@v4
+
+    - name: Install Debian Core Keyrings
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y debian-archive-keyring
+
+    - name: Execute Master Compiler Script
+      run: |
+        # Make the script executable and run it under true cloud root privileges
+        chmod +x build.sh
+        sudo ./build.sh
+
+    - name: Upload Finished Nexus OS ISO to Cloud Storage
+      uses: actions/upload-artifact@v4
+      with:
+        name: Nexus-OS-v1-Boot-Media
+        path: nexus_os_v1.iso
+        if-no-files-found: error
